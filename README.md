@@ -53,6 +53,13 @@ To recreate the analysis used in our final report:
 
 (The visualizations used in the report are predictions of AAPL price -- the example code in the usage section will generate them)
 
+## INFO 443 Checkpoint 2
+
+Here are the UML and Data Flow diagrams for checkpoint 2.
+![UML](images/Checkpoint_2_UML.jpg)
+![Data Flow](images/sequence_diagram.png)
+
+
 
 ## Acknowledgements
 
