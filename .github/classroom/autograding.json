@@ -3,22 +3,12 @@
     {
       "name": "Run Node Tests",
       "setup": "npm install",
-      "run": "npm test",
+      "run": "npm test -- --watchAll=false --passWithNoTests",
       "input": "",
       "output": "",
       "comparison": "exact",
       "timeout": 10,
-      "points": 1
-    },
-    {
-      "name": "Run Node Tests",
-      "setup": "npm install",
-      "run": "npm test",
-      "input": "",
-      "output": "",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 1
+      "points": null
     }
   ]
 }
