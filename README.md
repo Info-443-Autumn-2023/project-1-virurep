@@ -59,7 +59,9 @@ Here are the UML and Data Flow diagrams for checkpoint 2.
 ![UML](images/Checkpoint_2_UML.jpg)
 ![Data Flow](images/sequence_diagram.png)
 
+## INFO 443 Checkpoint 3
 
+To test this code, first open the test_stock.py file and simply type pytest in the command line. Thank you!
 
 ## Acknowledgements
 
