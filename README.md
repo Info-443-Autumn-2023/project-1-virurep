@@ -57,7 +57,15 @@ To recreate the analysis used in our final report:
 
 ## Code Structure Analysis
 
- <iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVNcv-lL8=/?moveToViewport=-3710,-6114,6048,3296&embedId=987279616542" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+### Architectural Elements
+![UML](images/Checkpoint_2_UML.jpg)
+### Information Process FLows
+![Data Flow](images/sequence_diagram.png)
+## Architecure Analysis
+
+## Automated Tests
+
+## Refactoring Code
 
 ## INFO 443 Checkpoint 2
 
