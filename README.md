@@ -1,4 +1,4 @@
-# ml-stock
+# Stock Market Prediction Using Machine Learning
 
 ## About
 
@@ -15,13 +15,13 @@ Built-in visualization methods using Plotly.
 1. Install Dependences
 
 ```{python}
-python3 -m pip install pandas numpy plotly yfinance scikit-learn
+python3 -m pip install pandas numpy plotly yfinance scikit-learn pytest
 ```
 
 2. Run test script to check
 
 ```{python}
-python3 test_stock.py
+python3 pytest
 ```
 
 If the test script produces no output, then your environment is successfully configured!
@@ -53,6 +53,12 @@ To recreate the analysis used in our final report:
 
 (The visualizations used in the report are predictions of AAPL price -- the example code in the usage section will generate them)
 
+# INFO 443 PROJECT 1 REPORT
+
+## Code Structure Analysis
+
+ <iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVNcv-lL8=/?moveToViewport=-3710,-6114,6048,3296&embedId=987279616542" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+
 ## INFO 443 Checkpoint 2
 
 Here are the UML and Data Flow diagrams for checkpoint 2.
@@ -65,6 +71,5 @@ To test this code, first open the test_stock.py file and simply type pytest in t
 
 ## Acknowledgements
 
-- Prof. Schaefer for `cse163_utils.py` and the assert_equals function, used for testing.
 - [yfinance](https://pypi.org/project/yfinance/), used to download price data from Yahoo finance
 - Other packages used: [NumPy](https://numpy.org/), [Pandas](https://pandas.pydata.org/), [Scikit-learn](https://scikit-learn.org/stable/), [Plotly Python Library](https://plotly.com/python/)
