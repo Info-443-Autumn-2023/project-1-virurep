@@ -24,6 +24,7 @@ import os
 from aggregate_table import agg_table
 import pandas as pd
 from analysis import main, write_agg_csv
+import pytest
 
 
 def test_initializer() -> None:
@@ -150,6 +151,7 @@ def test_agg_table_generation():
     with open(SAMPLE_FILENAME, "w") as f:
         f.write("AAPL\nMSFT\nGOOGL\n")
     aggregate_table = agg_table(SAMPLE_FILENAME)
+    print(aggregate_table.index)
     expected_tickers = ["AAPL", "MSFT", "GOOGL"]
     expected_model_names = ["KNN", "KNN_NO_VOLUME", "FR", "FR_NO_VOLUME"]
 
@@ -163,119 +165,30 @@ def test_agg_table_generation():
     os.remove(SAMPLE_FILENAME)
 
 
-# def sample_stock_file():
-#     # Create a sample input file with stock tickers
-#     with open(SAMPLE_FILENAME, "w") as f:
-#         f.write("AAPL\nMSFT\nGOOGL\n")
-#     yield
-#     # Clean up the sample input file
-#     os.remove(SAMPLE_FILENAME)
-#     # Clean up the expected output file if it exists
-#     if os.path.exists(EXPECTED_OUTPUT_FILE):
-#         os.remove(EXPECTED_OUTPUT_FILE)
+@pytest.fixture(scope="function")
+def prepare_test_env():
+    # Set up (before test)
+    test_csv_file = 'test_results.csv'
+    yield test_csv_file  # Return the file name for the testpyte
 
 
-# def clean_up_output_file(sample_stock_file):
-#     yield
-#     # Clean up the expected output file if it exists
-#     if os.path.exists(EXPECTED_OUTPUT_FILE):
-#         os.remove(EXPECTED_OUTPUT_FILE)
+# Test the write_agg_csv function
+def test_write_agg_csv(prepare_test_env):
+    # Run the function
+    write_agg_csv()
+
+    # Check if the CSV file was created
+    assert os.path.exists('results.csv')
 
 
-# def test_write_agg_csv():
-#     # Call write_agg_csv with the sample input file
-#     write_agg_csv()
+# Test the main function
+def test_main(prepare_test_env):
+    # Prepare a test CSV file for the 'main' function
 
-#     # Check if the expected output file has been created
-#     assert os.path.isfile(EXPECTED_OUTPUT_FILE)
+    # Run the main function with 'data' set to True
+    main(data=True)
 
-#     # Read the expected output file as a DataFrame
-#     expected_df = pd.read_csv(EXPECTED_OUTPUT_FILE)
-
-#     # Check if the generated DataFrame matches the expected DataFrame structure
-#     assert isinstance(expected_df, pd.DataFrame)
-#     assert expected_df.index.to_list() == ["AAPL", "MSFT", "GOOGL"]
-#     expected_columns = ["KNN", "KNN_NO_VOLUME", "FR", "FR_NO_VOLUME"]
-#     assert all(column in expected_df.columns for column in expected_columns)
-
-
-# def test_write_agg_csv_with_existing_output(sample_stock_file):
-#     # Manually create the expected output file
-#     expected_data = {
-#         "KNN": [0.1, 0.2, 0.3],
-#         "KNN_NO_VOLUME": [0.2, 0.3, 0.4],
-#         "FR": [0.3, 0.4, 0.5],
-#         "FR_NO_VOLUME": [0.4, 0.5, 0.6]
-#     }
-#     expected_df = pd.DataFrame(expected_data, index=["AAPL", "MSFT", "GOOGL"])
-#     expected_df.to_csv(EXPECTED_OUTPUT_FILE, encoding='utf-8', index_label="Stock")
-
-#     # Call write_agg_csv with the sample input file
-#     write_agg_csv()
-
-#     # Read the expected output file
-#     expected_df = pd.read_csv(EXPECTED_OUTPUT_FILE)
-
-#     # Check if the generated DataFrame matches the expected DataFrame
-#     assert isinstance(expected_df, pd.DataFrame)
-#     assert expected_df.equals(expected_df)
-
-
-# # Define the expected output filename
-# EXPECTED_OUTPUT_FILE = "results.csv"
-
-
-# def test_main():
-#     # Manually create the expected output file
-#     expected_data = {
-#         "Stock": ["AAPL", "MSFT", "GOOGL"],
-#         "KNN": [0.1, 0.2, 0.3],
-#         "KNN_NO_VOLUME": [0.2, 0.3, 0.4],
-#         "FR": [0.3, 0.4, 0.5],
-#         "FR_NO_VOLUME": [0.4, 0.5, 0.6]
-#     }
-#     expected_df = pd.DataFrame(expected_data)
-#     expected_df.to_csv(EXPECTED_OUTPUT_FILE, encoding='utf-8', index=False)
-
-#     # Call main with 'data' set to True
-#     main(data=True)
-
-#     # Check if the expected output file has been created
-#     assert os.path.isfile(EXPECTED_OUTPUT_FILE)
-
-#     # Read the expected output file
-#     expected_df = pd.read_csv(EXPECTED_OUTPUT_FILE)
-
-#     # Check if 'Best Model' and 'Worst Model' columns are added as expected
-#     assert 'Best Model' in expected_df.columns
-#     assert 'Worst Model' in expected_df.columns
-
-#     # Check if the values in the 'Best Model' and 'Worst Model' columns match
-#     # the expected values
-#     assert list(expected_df['Best Model']) == ['KNN', 'KNN', 'KNN']
-#     assert list(expected_df['Worst Model']) == ['FR_NO_VOLUME', 'FR_NO_VOLUME', 'FR_NO_VOLUME']
-
-
-# def test_main_with_existing_data(clean_up_output_file):
-#     # Call write_agg_csv to create the expected output file
-#     write_agg_csv()
-
-#     # Call main with 'data' set to True
-#     main(data=True)
-
-#     # Check if the expected output file has been created
-#     assert os.path.isfile(EXPECTED_OUTPUT_FILE)
-
-#     # Read the expected output file
-#     expected_df = pd.read_csv(EXPECTED_OUTPUT_FILE)
-
-#     # Check if 'Best Model' and 'Worst Model' columns are added as expected
-#     assert 'Best Model' in expected_df.columns
-#     assert 'Worst Model' in expected_df.columns
-
-#     # Check if the values in the 'Best Model' and 'Worst Model' columns match
-#     # the expected values
-#     assert list(expected_df['Best Model']) == ['KNN', 'KNN', 'KNN']
-#     assert list(expected_df['Worst Model']) == ['FR_NO_VOLUME',
-#                                                 'FR_NO_VOLUME',
-#                                                 'FR_NO_VOLUME']
+    # Check if the 'Best Model' and 'Worst Model' columns were added to the CSV
+    df = pd.read_csv(test_csv_file)
+    assert 'Best Model' in df.columns
+    assert 'Worst Model' in df.columns

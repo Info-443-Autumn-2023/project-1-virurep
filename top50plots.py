@@ -20,7 +20,7 @@ def stocks_processing(filename: str) -> None:
 
     for ticker in stocks_list:
         analysis_stock = Stock(ticker=ticker,
-                               end_date=dt.date(2022, 12, 15))
+                               end_date=dt.date(2023, 10, 30))
         analysis_stock.run_models()
         analysis_stock.plot_predicted_vs_actual()
         analysis_stock.plot_future()
