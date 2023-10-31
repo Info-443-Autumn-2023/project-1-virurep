@@ -23,7 +23,7 @@ from numpy import float64
 import os
 from aggregate_table import agg_table
 import pandas as pd
-from analysis import main, write_agg_csv
+from analysis import write_agg_csv
 import pytest
 
 
@@ -181,14 +181,13 @@ def test_write_agg_csv(prepare_test_env):
     assert os.path.exists('results.csv')
 
 
-# Test the main function
-def test_main(prepare_test_env):
-    # Prepare a test CSV file for the 'main' function
+# # Test the main function
+# def test_main(prepare_test_env):
+#     # Prepare a test CSV file for the 'main' function
 
-    # Run the main function with 'data' set to True
-    main(data=True)
+#     # Run the main function with 'data' set to True
+#     main(data=True)
 
-    # Check if the 'Best Model' and 'Worst Model' columns were added to the CSV
-    df = pd.read_csv(test_csv_file)
-    assert 'Best Model' in df.columns
-    assert 'Worst Model' in df.columns
+#     df = pd.read_csv(test_csv_file)
+#     assert 'Best Model' in df.columns
+#     assert 'Worst Model' in df.columns

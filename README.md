@@ -42,17 +42,6 @@ aapl.plot_predicted_vs_actual()  # Saves visualizations to 'plots' folder
 aapl.predict_future()  # Saves visualizations to 'plots' folder 
 ```
 
-## Recreating Report Results
-
-The file `stocks.txt` defines which stocks are included in the analysis.  Currently, they are the top 50 performing stocks.
-
-To recreate the analysis used in our final report:
-- Run `top50plots.py` to generate the visualizations for each stock.
-- Run `analysis.py` to calculate which models were the most and least accurate.
-    - Change the main function's parameter to `True` to recompute the results.csv file.  By default, the program uses the included file (the specific one we used in our analysis).
-
-(The visualizations used in the report are predictions of AAPL price -- the example code in the usage section will generate them)
-
 # INFO 443 PROJECT 1 REPORT
 
 ## Code Structure Analysis
@@ -99,40 +88,46 @@ These functions have the capbility to clean up the data, run the machine learnin
 
 The aggregate table is a csv table created to look at the mean-squared error(mse) of each of the machine learning models. The mse is used to calculate the accuracy of the model. It is important to find the most accurate model so that we are able to accurately predict future data. This file primarily calls the `run_models` method from the stock class.
 
-Meanwhile the top 50 plots file uses a list of the top 50 traded stocks on the United States Stock Market and plots five graphs for each stock. Four of these plots are the comparisions of the machine learning predicted data
+Meanwhile the top 50 plots file uses a list of the top 50 traded stocks on the United States Stock Market and plots five graphs for each stock. Four of these plots are the comparisions of the machine learning predicted data. These plots are useful for providing a comparision for the machine learning model versus what actually happened in the markets. The final plot is future prediction that is used by our calculated most accurate model. This plot helps to see what the plot is going to look like 60 days in the future. This module uses the `run_models` and ` plot_future` methods to visualize the machine learning calculated data.
 
+In addition, to the logic created by my team, our modules use two machine learning regressors provided by sci-kit learn to run the training and prediction of the data. 
 
+* K-NN Regressor relies on the similarity between data points. To make a prediction, it finds the K-nearest neighbors to a new data point based on a distance metric and averages their target values to produce the final prediction.
+
+* Random Forest Regressor, on the other hand, builds an ensemble of decision trees. Each tree is trained on a different subset of the data and features. When making a prediction, it aggregates the predictions from all trees to obtain the final result. This ensemble approach helps reduce overfitting and improves the model's accuracy.
+
+These models are utilized by the `Stock` class and the values that they return are used across the various methods in the class.
+
+The last file that this project utilizes is the analysis file. This file uses the aggregate table that was created earlier and looks at the calcualted mse values to determine which model has the most accurate prediction. 
+
+**To visually understand how these files are connected refer to the UML diagram below:**
 ![UML](images/Checkpoint_2_UML.jpg)
-### Information Process FLows
+
+### Information Process Flows
 ![Data Flow](images/sequence_diagram.png)
 
 ## Architecure Analysis
 
-Code Smells:
+To meet the size requirements for the architecural analysis I am using the entire module. This includes the files `Stock.py, top_50_stocks.py, aggregate_table.py, and analysis.py`. Please note that it doesn't use the machine learning models or the yfinace API since our project did not contribute to those platforms.
 
-Long Method: The plot_predicted_vs_actual method is quite long and contains repetitive code for plotting different models. 
+**Problems:**
 
-Hardcoded Values / Primitve Obsession: There are some hardcoded values, such as 60 in fig_future.add_trace, which could be replaced with named constants for better readability and maintainability.
+Long Method: The `plot_predicted_vs_actual` method  is quite long and contains repetitive code for plotting different models. 
 
-No Error Handling in Plotting: The code for plotting doesn't handle potential errors when saving plot images. It's important to handle exceptions that might occur during file operations.
+Hardcoded Values : There are some hardcoded values, such as 60 in `fig_future.add_trace`, which could be replaced with named constants for better readability and maintainability.
 
-Unecessary Use of  Global Main Function: Analysis is done within the main function, this code can be rewritten as it's own function to be called in main. 
+No Error Handling in Plotting: The code for plotting (`plot_predicted_vs_actual`,`plot_future`) doesn't handle potential errors when saving plot images. It's important to handle exceptions that might occur during file operations.
+
+Unecessary Use of Global Main Function: In the `analysis.py` file the analysis is done within the main function, this code can be rewritten as it's own function to be called in main. This makes the code more readable and easier to test.
 
 Lack of Comments/Documentation: While there are some docstrings present, there are still some parts of the code that could benefit from more comments or explanations. For instance, the purpose of the private fields and their naming conventions could be clarified.
 
-Inconsistent Naming: cutoff_d meanwhile others have date.
-
-
+Inconsistent Naming: In the Stock class some variables are named differently from similar couterparts which may cause confusion. For example, `cutoff_d `is used while variables such as `start_date` and `end_date` have the word date in their names.
 
 ## Automated Tests
 
 ## Refactoring Code
 
-## INFO 443 Checkpoint 2
-
-Here are the UML and Data Flow diagrams for checkpoint 2.
-![UML](images/Checkpoint_2_UML.jpg)
-![Data Flow](images/sequence_diagram.png)
 
 ## INFO 443 Checkpoint 3
 
