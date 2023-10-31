@@ -8,25 +8,14 @@ from aggregate_table import agg_table
 import pandas as pd
 
 
-def write_agg_csv() -> None:
+def write_agg_csv() -> pd.DataFrame:
     '''
-    Writes aggregate CSV file using agg_table
+    Writes aggregate CSV file using agg_table.
+    Contains analysis logic.
     '''
     df = agg_table('stocks.txt')
     df.to_csv('results.csv', encoding='utf-8')
 
-
-def main(data: bool = False) -> None:
-    '''
-    Contains main analysis logic.
-    Takes in boolean 'data' which represents whether the aggregate table
-    values have already been calculated and saved as 'results.csv'. (avoids
-    rerunning expensive calculations)
-
-    '''
-    if data is True:
-        write_agg_csv()
-    df = pd.read_csv('results.csv')
     # Calculate the best model for each Stock
     df['Best Model'] = df.loc[:, ['KNN', 'KNN_NO_VOLUME',
                               'FR', 'FR_NO_VOLUME']].idxmin(axis=1)
@@ -40,7 +29,11 @@ def main(data: bool = False) -> None:
     # Print out the worst models
     print('Number of times each model was the least accurate')
     print(df['Worst Model'].value_counts())
-    print(df['Worst Model'])
+    return df
+
+
+def main() -> None:
+    write_agg_csv()
 
 
 if __name__ == '__main__':

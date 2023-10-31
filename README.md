@@ -12,19 +12,11 @@ Built-in visualization methods using Plotly.
 
 ## Setup
 
-1. Install Dependences
+ Installing Dependencies
 
 ```{python}
 python3 -m pip install pandas numpy plotly yfinance scikit-learn pytest
 ```
-
-2. Run test script to check
-
-```{python}
-python3 pytest
-```
-
-If the test script produces no output, then your environment is successfully configured!
 
 ## Usage
 
@@ -43,6 +35,9 @@ aapl.predict_future()  # Saves visualizations to 'plots' folder
 ```
 
 # INFO 443 PROJECT 1 REPORT
+
+###  Viru Repalle and Jessica Mendoza | November 1st, 2023
+
 
 ## Code Structure Analysis
 
@@ -63,25 +58,25 @@ Visualization: To add a visual aid to our model, we will use the Plotly library 
 
 The primary logic of the project lies within the `Stock` class. This class contains seven methods that are called on by other files within the project. The methods alongside their functionality is as follows:
 
-`__init__(self, ticker: str, end_date: dt.date = dt.date.today()) -> None`
+**`__init__`**
 * Initializes a Stock object by downloading 1 year of stock data for a given ticker symbol. It splits the data into training and test datasets, with the test data representing the last 2 months of the data.
 
-`_run_knn(self, train_f: pd.DataFrame, test_f: pd.DataFrame, train_l: pd.DataFrame, test_l: pd.DataFrame) -> tuple[KNeighborsRegressor, npt.NDArray[np.float64], float]`
+**`_run_knn`**
 * Fits a K-Nearest Neighbors (KNN) model given training and testing data pre-split. Returns a tuple containing the KNN model, the predicted data, and the Mean Squared Error (MSE).
 
-`_run_fr(self, train_f: pd.DataFrame, test_f: pd.DataFrame, train_l: pd.DataFrame, test_l: pd.DataFrame) -> tuple[RandomForestRegressor, npt.NDArray[np.float64], float]`
+**`_run_fr`**
 * Fits a Random Forest (RF) model given training and testing data pre-split. Returns a tuple containing the Random Forest model, the predicted data, and the Mean Squared Error (MSE).
 
-`run_models(self) -> None`
+**`run_models`**
 * Runs both KNN and Random Forest models using the training and test data and stores the results as private fields for later use with helper methods. It does this for both datasets with and without volume information.
 
-`get_data(self) -> dict[str, float]`
+**`get_data`**
 * Returns a dictionary containing the Mean Squared Error (MSE) values of the four tested models, including KNN and Random Forest models with and without volume information.
 
-`plot_predicted_vs_actual(self) -> None`
+**`plot_predicted_vs_actual`**
 * Plots the predicted stock prices versus the actual stock prices for both KNN and Random Forest models, with and without volume information. It saves the plots as image files.
 
-`plot_future(self) -> None`
+**`plot_future`**
 * Plots the future predicted stock prices for a month in advance using the Random Forest Regressor, which is assumed to have the least amount of error. It saves the plot as an image file.
 
 These functions have the capbility to clean up the data, run the machine learning models, and plot the data. They are then called by the aggregate_table process and the top_fifty_plots method. 
@@ -101,37 +96,89 @@ These models are utilized by the `Stock` class and the values that they return a
 The last file that this project utilizes is the analysis file. This file uses the aggregate table that was created earlier and looks at the calcualted mse values to determine which model has the most accurate prediction. 
 
 **To visually understand how these files are connected refer to the UML diagram below:**
-![UML](images/Checkpoint_2_UML.jpg)
+![UML Diagram](images/Checkpoint_2_UML.jpg "")
 
 ### Information Process Flows
-![Data Flow](images/sequence_diagram.png)
+![Data Flow Diagram](images/sequence_diagram.png "")
 
 ## Architecure Analysis
 
 To meet the size requirements for the architecural analysis I am using the entire module. This includes the files `Stock.py, top_50_stocks.py, aggregate_table.py, and analysis.py`. Please note that it doesn't use the machine learning models or the yfinace API since our project did not contribute to those platforms.
 
-**Problems:**
+### Problems:
 
-Long Method: The `plot_predicted_vs_actual` method  is quite long and contains repetitive code for plotting different models. 
+**Long Method**: The `plot_predicted_vs_actual` method  is quite long and contains repetitive code for plotting different models. 
 
-Hardcoded Values : There are some hardcoded values, such as 60 in `fig_future.add_trace`, which could be replaced with named constants for better readability and maintainability.
+**Hardcoded Values** : There are some hardcoded values, such as 60 in `fig_future.add_trace`, which could be replaced with named constants for better readability and maintainability.
 
-No Error Handling in Plotting: The code for plotting (`plot_predicted_vs_actual`,`plot_future`) doesn't handle potential errors when saving plot images. It's important to handle exceptions that might occur during file operations.
+**No Error Handling in Plotting**: The code for plotting (`plot_predicted_vs_actual`,`plot_future`) doesn't handle potential errors when saving plot images. It's important to handle exceptions that might occur during file operations.
 
-Unecessary Use of Global Main Function: In the `analysis.py` file the analysis is done within the main function, this code can be rewritten as it's own function to be called in main. This makes the code more readable and easier to test.
+**Unecessary Use of Global Main Function**: In the `analysis.py` file the analysis is done within the main function, this code can be rewritten as it's own function to be called in main. This makes the code more readable and easier to test. This was an architectural defienciency because it made it very difficult to test.
 
-Lack of Comments/Documentation: While there are some docstrings present, there are still some parts of the code that could benefit from more comments or explanations. For instance, the purpose of the private fields and their naming conventions could be clarified.
+**Lack of Comments/Documentation**: While there are some docstrings present, there are still some parts of the code that could benefit from more comments or explanations. For instance, the purpose of the private fields and their naming conventions could be clarified.
 
-Inconsistent Naming: In the Stock class some variables are named differently from similar couterparts which may cause confusion. For example, `cutoff_d `is used while variables such as `start_date` and `end_date` have the word date in their names.
+**Inconsistent Naming**: In the Stock class some variables are named differently from similar couterparts which may cause confusion. For example, `cutoff_d `is used while variables such as `start_date` and `end_date` have the word date in their names.
 
 ## Automated Tests
+
+To by able to run the tests you must have pytest installed. You can do this like so.
+
+```{python}
+python3 -m pip install pytest
+```
+
+The testing file is labeled as `test_stock.py`. To run the tests first navigate to the directory within the terminal, then you can simply type `pytest`. To see the coverage information you can use `pytest --cov`.
+
+```{python}
+directory/project-1-virurep pytest
+directory/project-1-virurep pytest --cov
+```
+
+We have written the following tests to evaluate the code:
+
+1. **test_initializer():**
+   - **Inputs tested:** The initialization of the `Stock` class with a specific ticker and end date.
+   - **Justification:** This test ensures that the `Stock` class initializes with the correct attributes, including the ticker, start date, end date, cutoff date, and data frame. It also verifies that the data is split correctly.
+
+2. **test_knn():**
+   - **Inputs tested:** The `_run_KNN` method of the `Stock` class.
+   - **Justification:** This test checks if the K-Nearest Neighbors (KNN) model runs without errors and returns the expected output, which includes a KNeighborsRegressor instance, a specific number of predictions, and the correct data type for the error metric.
+
+3. **test_fr():**
+   - **Inputs tested:** The `_run_fr` method of the `Stock` class, which implements the Random Forest Regressor model.
+   - **Justification:** This test verifies that the Random Forest Regressor model runs without errors and returns the expected output, including a RandomForestRegressor instance, a specific number of predictions, and the correct data type for the error metric.
+
+4. **test_output_data():**
+   - **Inputs tested:** The `run_models` and `get_data` methods of the `Stock` class.
+   - **Justification:** This test checks if the models run successfully and if the data returned by the `get_data` method is as expected in terms of keys, lengths, and data types.
+
+5. **test_plot_predicted_vs_actual():**
+   - **Inputs tested:** The `plot_predicted_vs_actual` method of the `Stock` class.
+   - **Justification:** This test ensures that the method generates plot files for predicted vs. actual values and checks if these files exist in the "plots" folder.
+
+6. **test_plot_future():**
+   - **Inputs tested:** The `plot_future` method of the `Stock` class.
+   - **Justification:** This test verifies that the method generates plot files for future values and checks if these files exist in the "plots" folder.
+
+7. **test_agg_table_generation():**
+   - **Inputs tested:** The `agg_table` function.
+   - **Justification:** This test checks if the function generates an aggregate table correctly by providing a sample file and verifying the resulting DataFrame's structure.
+
+8. **test_write_agg_csv():**
+   - **Inputs tested:** The `write_agg_csv` function.
+   - **Justification:** This test verifies that the function correctly generates an output CSV file, checks the data type of the returned DataFrame, captures the printed output, and checks for the presence of expected output messages and DataFrame columns.
+
+9. **test_stocks_processing():**
+   - **Inputs tested:** The `stocks_processing` function.
+   - **Justification:** This test ensures that the function processes a sample stocks file correctly, creates output files in the "plots" folder, and checks if the expected files are present in the "plots" folder.
+
+Overall these tests cover the majority of the code as evaluated by `pytest --cov`. It is important to note that the missed areas of the tests refer to the main function within the files. This does not need to be tested because the main function just runs the other functions; it does not contain logic of its own.
+
+![Testing Coverage Diagram](images/testing_coverage.png)
 
 ## Refactoring Code
 
 
-## INFO 443 Checkpoint 3
-
-To test this code, first open the test_stock.py file and simply type pytest in the command line. Thank you!
 
 ## Acknowledgements
 

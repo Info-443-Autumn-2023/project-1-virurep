@@ -16,15 +16,16 @@ Utilizes the assert_equals function from the CSE 163 assignments environment.
 """
 
 from stock import Stock
-import datetime as dt
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
 from numpy import float64
-import os
 from aggregate_table import agg_table
-import pandas as pd
 from analysis import write_agg_csv
+from top50plots import stocks_processing
 import pytest
+import pandas as pd
+import os
+import datetime as dt
 
 
 def test_initializer() -> None:
@@ -59,15 +60,20 @@ def test_initializer() -> None:
 
 def test_knn():
     """
-    Tests the _run_KNN method of the `Stock` class (Implementation of the
-    KNN model)
-    Returns none, crashes if any tests fail.
+    Tests the _run_KNN method of the `Stock` class.
+    Ensures that the method returns the expected results and handles errors.
     """
     f_s = Stock("F", end_date=dt.date(2022, 10, 5))
     out = f_s._run_knn(f_s._train_f, f_s._test_f, f_s._train_l, f_s._test_l)
-    assert type(out[0]) is type(KNeighborsRegressor())
-    assert len(out[1]) == 41
-    assert type(out[2]) is float64
+
+    assert isinstance(out[0], KNeighborsRegressor), "Expected a\
+          KNeighborsRegressor instance."
+
+    expected_length = 41
+    assert len(out[1]) == expected_length, f"Expected a length of\
+          {expected_length}."
+
+    assert isinstance(out[2], float), "Expected a float value."
 
 
 def test_fr():
@@ -78,9 +84,15 @@ def test_fr():
     """
     f_s = Stock("F", end_date=dt.date(2022, 10, 5))
     out = f_s._run_fr(f_s._train_f, f_s._test_f, f_s._train_l, f_s._test_l)
+
     assert type(out[0]) is type(RandomForestRegressor())
-    assert len(out[1]) == 41
-    assert type(out[2]) is float64
+
+    expected_length = 41
+    assert len(out[1]) == expected_length, f"Expected a length of \
+          {expected_length} but got {len(out[1])}."
+
+    assert type(out[2]) is float64, f"Expected a \
+          {float64} but got {type(out[2])}."
 
 
 def test_output_data() -> None:
@@ -92,13 +104,23 @@ def test_output_data() -> None:
     f_s = Stock("F", end_date=dt.date(2022, 10, 5))
     f_s.run_models()
     data = f_s.get_data()
+
     exp_keys = ["KNN", "KNN_NO_VOLUME", "FR", "FR_NO_VOLUME"]
-    assert list(data.keys()) == exp_keys
-    assert len(data) == 4
-    assert type(data["KNN"]) is float64
-    assert type(data["KNN_NO_VOLUME"]) is float64
-    assert type(data["FR"]) is float64
-    assert type(data["FR_NO_VOLUME"]) is float64
+    assert list(data.keys()) == exp_keys, f"Expected keys: {exp_keys},\
+          but got keys: {list(data.keys())}"
+
+    expected_length = 4
+    assert len(data) == expected_length, f"Expected a length of\
+          {expected_length}, but got a length of {len(data)}."
+
+    assert isinstance(data["KNN"], float), "Expected a float type for 'KNN'\
+          value."
+    assert isinstance(data["KNN_NO_VOLUME"], float), "Expected a float type\
+          for 'KNN_NO_VOLUME' value."
+    assert isinstance(data["FR"], float), "Expected a float type for 'FR'\
+          value."
+    assert isinstance(data["FR_NO_VOLUME"], float), "Expected a float type for\
+          'FR_NO_VOLUME' value."
 
 
 def test_plot_predicted_vs_actual():
@@ -155,39 +177,82 @@ def test_agg_table_generation():
     expected_tickers = ["AAPL", "MSFT", "GOOGL"]
     expected_model_names = ["KNN", "KNN_NO_VOLUME", "FR", "FR_NO_VOLUME"]
 
-    assert isinstance(aggregate_table, pd.DataFrame)
-    assert aggregate_table.index.to_list() == expected_tickers
+    assert isinstance(aggregate_table, pd.DataFrame), \
+           "Expected 'aggregate_table' to be a pandas DataFrame."
+    assert aggregate_table.index.to_list() == expected_tickers, "Table Index\
+        Incorrect"
     assert all(column in aggregate_table.columns for column in
-               expected_model_names)
-    assert aggregate_table.dtypes.eq(float).all()
+               expected_model_names), "Aggregate Table Error"
+    assert aggregate_table.dtypes.eq(float).all(), "Aggregate Table Type Error"
 
     # Clean up the sample input file
     os.remove(SAMPLE_FILENAME)
 
 
-@pytest.fixture(scope="function")
-def prepare_test_env():
-    # Set up (before test)
-    test_csv_file = 'test_results.csv'
-    yield test_csv_file  # Return the file name for the testpyte
+# Define test data and filenames for agg_csv test
+test_input_file = "test_stocks.txt"
+test_output_file = "test_results.csv"
 
 
-# Test the write_agg_csv function
-def test_write_agg_csv(prepare_test_env):
-    # Run the function
-    write_agg_csv()
+@pytest.fixture
+def sample_data():
+    '''
+    Creates Sample Data for testing.
+    '''
+    data = {
+        "Stock": ["AAPL", "GOOGL", "MSFT", "AMZN"],
+        "KNN": [0.95, 0.92, 0.91, 0.93],
+        "KNN_NO_VOLUME": [0.94, 0.91, 0.90, 0.92],
+        "FR": [0.97, 0.93, 0.92, 0.95],
+        "FR_NO_VOLUME": [0.96, 0.92, 0.91, 0.94]
+    }
+    df = pd.DataFrame(data)
+    return df
 
-    # Check if the CSV file was created
+
+def test_write_agg_csv(capsys, sample_data):
+    '''
+    Test the write_agg_csv function.
+    This test verifies that the write_agg_csv function correctly
+    generates an output CSV file, checks the data type of the returned
+    DataFrame, captures the printed output, and checks for the presence
+    of expected output messages and DataFrame columns.
+    '''
+    sample_data.to_csv(test_input_file, index=False)
+    df = write_agg_csv()
     assert os.path.exists('results.csv')
+    assert isinstance(df, pd.DataFrame), "Function did not return a\
+          DataFrame"
+    captured = capsys.readouterr()
+    # Capture the printed output and check if it contains expected results
+    assert "Number of times each model was the most accurate" in \
+           captured.out,  "Incorrect Output"
+    assert "Number of times each model was the least accurate" in \
+           captured.out,  "Incorrect Output"
+    assert 'Best Model' in df.columns, "Dataframe Error"
+    assert 'Worst Model' in df.columns, "Dataframe Error"
 
 
-# # Test the main function
-# def test_main(prepare_test_env):
-#     # Prepare a test CSV file for the 'main' function
+def test_stocks_processing():
+    '''
+    Test the stocks_processing function.
+    This test verifies that the stocks_processing function correctly processes
+    a sample stocks file, creates output files in the "plots" folder, and
+    checks if the expected files are present in the "plots" folder.
+    '''
+    sample_file = "sample_stocks.txt"
+    with open(sample_file, "w") as f:
+        f.write("AAPL\nMSFT\nGOOGL\n")
+    stocks_processing(sample_file)
 
-#     # Run the main function with 'data' set to True
-#     main(data=True)
+    plots_folder = "plots"
+    files_in_plots = os.listdir(plots_folder)
+    expected_files = ["AAPL_knn.png",
+                      "GOOG_knn.png",
+                      "MSFT_knn.png"]
 
-#     df = pd.read_csv(test_csv_file)
-#     assert 'Best Model' in df.columns
-#     assert 'Worst Model' in df.columns
+    for expected_file in expected_files:
+        assert expected_file in files_in_plots, f"'{expected_file}' is\
+              not in the 'plots' folder."
+
+    os.remove(test_input_file)
