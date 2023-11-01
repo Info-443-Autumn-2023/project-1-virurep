@@ -129,84 +129,113 @@ class Stock:
         Plots the predicted data versus
         the actual data. Returns nothing.
         '''
-        layout = go.Layout(autosize=False,
-                           width=1500,
-                           height=500)
-        # plots knn without volume
-        fig_knn = go.Figure(layout=layout)
-        fig_knn.add_trace(go.Scatter(
-                      x=self._df.index,
-                      y=self._test_l,
-                      name='Actual Values',
-                      marker_color='blue'))
-        fig_knn.add_trace(go.Scatter(
-                      x=self._df.index,
-                      y=self._knn_pred,
-                      name='Predicted Values',
-                      marker_color='red'))
-        fig_knn.update_layout(title="Actual " + self._ticker + " Stock Prices\
- vs KNN Predicted Prices (without Volume)",
-                              xaxis_title="Date",
-                              yaxis_title="Stock Price(USD)",
-                              legend_title="Legend")
-        fig_knn.write_image(f"plots/{self._ticker}_knn.png")
+        layout = go.Layout(autosize=False, width=1500, height=500)
 
-        # plots knn with volume
-        fig_knn_v = go.Figure(layout=layout)
-        fig_knn_v.add_trace(go.Scatter(
-                            x=self._df.index,
-                            y=self._test_l,
-                            name='Actual Values',
-                            marker_color='blue'))
-        fig_knn_v.add_trace(go.Scatter(
-                            x=self._df.index,
-                            y=self._knn_pred_v,
-                            name='Predicted Values',
-                            marker_color='red'))
-        fig_knn_v.update_layout(title="Actual " + self._ticker + " Stock\
- Prices vs KNN Predicted Prices (with Volume)",
-                                xaxis_title="Date",
-                                yaxis_title="Stock Price(USD)",
-                                legend_title="Legend")
-        fig_knn_v.write_image(f"plots/{self._ticker}_knn_v.png")
+        models = ["knn", "knn_v", "fr", "fr_v"]
+        model_names = ["KNN Predicted Prices (without Volume)", "KNN Predicted Prices (with Volume)",
+                       "Forest Random Predicted Prices (without Volume)", "Forest Random Predicted Prices (with Volume)"]
 
-        # plots forest regressor without volume
-        fig_fr = go.Figure(layout=layout)
-        fig_fr.add_trace(go.Scatter(
-                      x=self._df.index,
-                      y=self._test_l,
-                      name='Actual Values',
-                      marker_color='blue'))
-        fig_fr.add_trace(go.Scatter(
-                      x=self._df.index,
-                      y=self._fr_pred,
-                      name='Predicted Values',
-                      marker_color='red'))
-        fig_fr.update_layout(title="Actual " + self._ticker + " Stock Prices\
- vs Forest Random Predicted Prices (without Volume)",
-                             xaxis_title="Date",
-                             yaxis_title="Stock Price(USD)",
-                             legend_title="Legend")
-        fig_fr.write_image(f"plots/{self._ticker}_fr.png")
+        for model, model_name in zip(models, model_names):
+            fig = go.Figure(layout=layout)
+            print(model)
+            fig.add_trace(go.Scatter(x=self._df.index, y=self._test_l, name='Actual Values', marker_color='blue'))
 
-        # plots forest regressor with volume
-        fig_fr_v = go.Figure(layout=layout)
-        fig_fr_v.add_trace(go.Scatter(
-                            x=self._df.index,
-                            y=self._test_l,
-                            name='Actual Values',
-                            marker_color='blue'))
-        fig_fr_v.add_trace(go.Scatter(
-                            x=self._df.index,
-                            y=self._fr_pred_v,
-                            name='Predicted Values',
-                            marker_color='red'))
-        fig_fr_v.update_layout(title="Actual " + self._ticker + " Stock Prices\
- vs Forest Random Predicted Prices (with Volume)",
-                               xaxis_title="Date",
-                               yaxis_title="Stock Price(USD)",
-                               legend_title="Legend")
-        fig_fr_v.write_image(f"plots/{self._ticker}_fr_v.png")
+            if "knn" in model:
+                y_pred = self._knn_pred if "knn" in model else self._fr_pred
+            else:
+                y_pred = self._knn_pred_v if "knn" in model else self._fr_pred_v
+
+            fig.add_trace(go.Scatter(x=self._df.index, y=y_pred, name='Predicted Values', marker_color='red'))
+
+            title = f"Actual {self._ticker} Stock Prices vs {model_name}"
+            filename = f"plots/{self._ticker}_{model}.png"
+
+            fig.update_layout(title=title, xaxis_title="Date", yaxis_title="Stock Price(USD)", legend_title="Legend")
+            fig.write_image(filename)
+
+#     def plot_predicted_vs_actual(self) -> None:
+#         '''
+#         Plots the predicted data versus
+#         the actual data. Returns nothing.
+#         '''
+#         layout = go.Layout(autosize=False,
+#                            width=1500,
+#                            height=500)
+#         # plots knn without volume
+#         fig_knn = go.Figure(layout=layout)
+#         fig_knn.add_trace(go.Scatter(
+#                       x=self._df.index,
+#                       y=self._test_l,
+#                       name='Actual Values',
+#                       marker_color='blue'))
+#         fig_knn.add_trace(go.Scatter(
+#                       x=self._df.index,
+#                       y=self._knn_pred,
+#                       name='Predicted Values',
+#                       marker_color='red'))
+#         fig_knn.update_layout(title="Actual " + self._ticker + " Stock Prices\
+#  vs KNN Predicted Prices (without Volume)",
+#                               xaxis_title="Date",
+#                               yaxis_title="Stock Price(USD)",
+#                               legend_title="Legend")
+#         fig_knn.write_image(f"plots/{self._ticker}_knn.png")
+
+#         # plots knn with volume
+#         fig_knn_v = go.Figure(layout=layout)
+#         fig_knn_v.add_trace(go.Scatter(
+#                             x=self._df.index,
+#                             y=self._test_l,
+#                             name='Actual Values',
+#                             marker_color='blue'))
+#         fig_knn_v.add_trace(go.Scatter(
+#                             x=self._df.index,
+#                             y=self._knn_pred_v,
+#                             name='Predicted Values',
+#                             marker_color='red'))
+#         fig_knn_v.update_layout(title="Actual " + self._ticker + " Stock\
+#  Prices vs KNN Predicted Prices (with Volume)",
+#                                 xaxis_title="Date",
+#                                 yaxis_title="Stock Price(USD)",
+#                                 legend_title="Legend")
+#         fig_knn_v.write_image(f"plots/{self._ticker}_knn_v.png")
+
+#         # plots forest regressor without volume
+#         fig_fr = go.Figure(layout=layout)
+#         fig_fr.add_trace(go.Scatter(
+#                       x=self._df.index,
+#                       y=self._test_l,
+#                       name='Actual Values',
+#                       marker_color='blue'))
+#         fig_fr.add_trace(go.Scatter(
+#                       x=self._df.index,
+#                       y=self._fr_pred,
+#                       name='Predicted Values',
+#                       marker_color='red'))
+#         fig_fr.update_layout(title="Actual " + self._ticker + " Stock Prices\
+#  vs Forest Random Predicted Prices (without Volume)",
+#                              xaxis_title="Date",
+#                              yaxis_title="Stock Price(USD)",
+#                              legend_title="Legend")
+#         fig_fr.write_image(f"plots/{self._ticker}_fr.png")
+
+#         # plots forest regressor with volume
+#         fig_fr_v = go.Figure(layout=layout)
+#         fig_fr_v.add_trace(go.Scatter(
+#                             x=self._df.index,
+#                             y=self._test_l,
+#                             name='Actual Values',
+#                             marker_color='blue'))
+#         fig_fr_v.add_trace(go.Scatter(
+#                             x=self._df.index,
+#                             y=self._fr_pred_v,
+#                             name='Predicted Values',
+#                             marker_color='red'))
+#         fig_fr_v.update_layout(title="Actual " + self._ticker + " Stock Prices\
+#  vs Forest Random Predicted Prices (with Volume)",
+#                                xaxis_title="Date",
+#                                yaxis_title="Stock Price(USD)",
+#                                legend_title="Legend")
+#         fig_fr_v.write_image(f"plots/{self._ticker}_fr_v.png")
 
     def plot_future(self) -> None:
         '''
