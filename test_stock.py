@@ -43,7 +43,7 @@ def test_initializer() -> None:
         2021, 10, 5
     ), "Initializer Error - Date \
           Error"
-    assert f_s._cutoff_d == dt.date(
+    assert f_s._cutoff_date == dt.date(
         2022, 8, 6
     ), "Initializer Error - Date \
           Error"

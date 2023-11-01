@@ -107,15 +107,15 @@ To meet the size requirements for the architecural analysis I am using the entir
 
 ### Problems:
 
-**Long Method**: The `plot_predicted_vs_actual` method  is quite long and contains repetitive code for plotting different models. 
+**Long Method**: The `plot_predicted_vs_actual` method  is quite long and contains repetitive code for plotting different models. This code is cluttered and inefficient. 
 
-**Hardcoded Values** : There are some hardcoded values, such as 60 in `fig_future.add_trace`, which could be replaced with named constants for better readability and maintainability.
+**Hardcoded Values** : There are some hardcoded values, such as 60 and 365 in the initializer, which could be replaced with named constants for better readability and maintainability.
 
 **No Error Handling in Plotting**: The code for plotting (`plot_predicted_vs_actual`,`plot_future`) doesn't handle potential errors when saving plot images. It's important to handle exceptions that might occur during file operations.
 
 **Unecessary Use of Global Main Function**: In the `analysis.py` file the analysis is done within the main function, this code can be rewritten as it's own function to be called in main. This makes the code more readable and easier to test. This was an architectural defienciency because it made it very difficult to test.
 
-**Lack of Comments/Documentation**: While there are some docstrings present, there are still some parts of the code that could benefit from more comments or explanations. For instance, the purpose of the private fields and their naming conventions could be clarified.
+**Lack of Comments/Documentation**: While there are some docstrings present, there are still some parts of the code that could benefit from more comments or explanations. For example the machine learning models aren't very easy to understand. This portion could benefit from additional comments explaining what is happening.
 
 **Inconsistent Naming**: In the Stock class some variables are named differently from similar couterparts which may cause confusion. For example, `cutoff_d `is used while variables such as `start_date` and `end_date` have the word date in their names.
 
@@ -178,7 +178,130 @@ Overall these tests cover the majority of the code as evaluated by `pytest --cov
 
 ## Refactoring Code
 
+**Long Method**: The long method was shortened using a for loop and conditional statements. This make the code more efficient and removes the repetetive code.
 
+```{python}
+    def plot_predicted_vs_actual(self) -> None:
+        '''
+        Plots the predicted data versus
+        the actual data. Returns nothing.
+        '''
+        try:
+            layout = go.Layout(autosize=False, width=1500, height=500)
+            models = ["knn", "knn_v", "fr", "fr_v"]
+            model_names = ["KNN Predicted Prices (without Volume)",
+                        "KNN Predicted Prices (with Volume)",
+                        "Forest Random Predicted Prices (without Volume)",
+                        "Forest Random Predicted Prices (with Volume)"]
+
+            for model, model_name in zip(models, model_names):
+                fig = go.Figure(layout=layout)
+                fig.add_trace(go.Scatter(x=self._df.index, y=self._test_l,
+                                         name='Actual Values',
+                                         marker_color='blue'))
+
+                if "knn" in model:
+                    y_pred = self._knn_pred if "knn" \
+                          in model else self._fr_pred
+                else:
+                    y_pred = self._knn_pred_v if "knn" \
+                        in model else self._fr_pred_v
+
+                fig.add_trace(go.Scatter(x=self._df.index, y=y_pred,
+                                         name='Predicted Values',
+                                         marker_color='red'))
+
+                title = f"Actual {self._ticker} Stock Prices vs {model_name}"
+                filename = f"plots/{self._ticker}_{model}.png"
+
+                fig.update_layout(title=title, xaxis_title="Date",
+                                  yaxis_title="Stock Price(USD)",
+                                  legend_title="Legend")
+                fig.write_image(filename)
+        except Exception as e:
+            print(f"Error occurred while plotting {model_name}: {str(e)}")
+```
+
+**Hardcoded Values** : The values were replaced with constants that were created as instances. Therefore, they can be called in several methods across the class multiple times without us having to hard code resused variables.
+
+```{python}
+   self._year: int = 365
+   self._cutoff_length: int = 60
+```
+
+**No Error Handling in Plotting**: Error handling was added to both plotting function. Now if a plot fails to render, the method will raise an error.
+
+```{python}
+    def plot_future(self) -> None:
+        '''
+        Plots a future predicted data for a month in advance
+        using the the Random Forest Regressor as it has the least
+        amount of error.
+        Returns nothing.
+        '''
+        try:
+            self._future, self._future_pred, self._future_mse =\
+                self._run_fr(self._future_train_features, self._test_f,
+                             self._future_train_labels, self._test_l)\
+
+            layout = go.Layout(autosize=False,
+                               width=1500,
+                               height=500)
+
+            # plots knn without volume
+            fig_future = go.Figure(layout=layout)
+            fig_future.add_trace(go.Scatter(
+                        x=[num for num in range(0, self._cutoff_length + 1)],
+                        y=self._future_pred,
+                        name='Future Values',
+                        marker_color='blue'))
+            fig_future.update_layout(title="Future " + self._ticker + " Stock\
+               vs Predicted By Random Forest Regressor (with Volume)",
+                                     xaxis_title="Days After Current Date",
+                                     yaxis_title="Stock Price(USD)",
+                                     legend_title="Legend")
+            fig_future.write_image(f"plots/{self._ticker}_future.png")
+        except Exception as e:
+            print(f"Error occurred while plotting {self._ticker} future plot: \
+                   {str(e)}")
+```
+
+**Unecessary Use of Global Main Function**: The analysis logic was added to the `write_agg_csv` method. This way there is nothing taking place in the main function. Now the function is much easier to test. The readability is also improved.
+
+```{python}
+   def write_agg_csv() -> pd.DataFrame:
+      '''
+      Writes aggregate CSV file using agg_table.
+      Contains analysis logic.
+      '''
+      df = agg_table('stocks.txt')
+      df.to_csv('results.csv', encoding='utf-8')
+
+      # Calculate the best model for each Stock
+      df['Best Model'] = df.loc[:, ['KNN', 'KNN_NO_VOLUME',
+                                 'FR', 'FR_NO_VOLUME']].idxmin(axis=1)
+      # Print out the best Models
+      print('Number of times each model was the most accurate')
+      print(df['Best Model'].value_counts())
+      print()
+      # Calculate the worst model
+      df['Worst Model'] = df.loc[:, ['KNN', 'KNN_NO_VOLUME',
+                                 'FR', 'FR_NO_VOLUME']].idxmax(axis=1)
+      # Print out the worst models
+      print('Number of times each model was the least accurate')
+      print(df['Worst Model'].value_counts())
+      return df
+```
+
+**Lack of Comments/Documentation**: Comments describing what the machine learning models are doing were added to clarify confusing processes.
+
+
+**Inconsistent Naming**: The naming of the `cutoff_d` variable was changed to `cutoff_date` across all files to make it easier to indentify alongside similar variables and avoid confusion. 
+
+```{python}
+   self._cutoff_date: dt.date = end_date - \
+            dt.timedelta(days=self._cutoff_length)
+```
 
 ## Acknowledgements
 
