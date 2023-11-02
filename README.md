@@ -98,12 +98,25 @@ The last file that this project utilizes is the analysis file. This file uses th
 **To visually understand how these files are connected refer to the UML diagram below:**
 ![UML Diagram](images/Checkpoint_2_UML%20.jpg "")
 
+**Figure 1: UML Diagram**
+
+*Caption:* This UML diagram represents the system's architectural structure, including classes, relationships, and key elements that are in our project.
+
+*Text Explanation:* Figure 1, the UML diagram, offers a visual representation of the system's architecture, providing insights into the relationships between classes and components. This diagram is included to aid in understanding the system's design and class interactions of the Stock Prediction model.
+
+
 ### Information Process Flows
 
 The system starts by initializing a stock object, where current and historical stock data is retrieved, organized, and stored in the Pandas DataFrame. The run_models are called on the object to run two separate machine learning modules, K-Nearest Neighbor (KNN) Regression, and Random Forest (RF) regression. For each model, the Mean Squared Error (MSE) is calculated and the results are stored within the Stock object. The plot_predicted_vs_actual method is called to generate visualizations comparing predicted and actual stock prices using Plotly, these plots are then saved to the ‘plots’ folder. The aggregate_table module generates a table that collects the MSE values for each model on different stocks. The analysis module analyzes the aggregate table to determine which model was the most and least accurate and calls the write_agg_csv function to write and aggregate the CSV file with the results.
 
 **To visually understand how the data flows, refer to the UML diagram below:**
 ![Data Flow Diagram](images/sequence_diagram.png "")
+
+**Figure 2: Data Flow Diagram**
+
+*Caption:* This data flow diagram illustrates the flow of data and information within the system.
+
+*Text Explanation:* Figure 2, the data flow diagram, shows how data and information move through the system. It clarifies how the Stock prediction model transfers data amongst its components.
 
 ## Architecure Analysis
 
@@ -179,6 +192,11 @@ We have written the following tests to evaluate the code:
 Overall these tests cover the majority of the code as evaluated by `pytest --cov`. It is important to note that the missed areas of the tests refer to the main function within the files. This does not need to be tested because the main function just runs the other functions; it does not contain logic of its own.
 
 ![Testing Coverage Diagram](images/testing_coverage.png)
+**Figure 3: Testing Coverage Report**
+
+*Caption:* This testing coverage report displays the code coverage metrics for the project's test suite, indicating how much of the code is evaulated by tests.
+
+*Text Explanation:* Figure 3, the testing coverage report, provides an overview of code coverage metrics for the project's tests using pytest coverage. It showcases the percentage of code covered by tests that we wrote.
 
 ## Refactoring Code
 
