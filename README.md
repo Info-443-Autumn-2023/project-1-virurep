@@ -303,6 +303,9 @@ Overall these tests cover the majority of the code as evaluated by `pytest --cov
             dt.timedelta(days=self._cutoff_length)
 ```
 
+## Code Process Flows
+The system starts by initializing a stock object, where current and historical stock data is retrieved, organized, and stored in the Pandas DataFrame. The run_models are called on the object to run two separate machine learning modules, K-Nearest Neighbor (KNN) Regression, and Random Forest (RF) regression. For each model, the Mean Squared Error (MSE) is calculated and the results are stored within the Stock object. The plot_predicted_vs_actual method is called to generate visualizations comparing predicted and actual stock prices using Plotly, these plots are then saved to the ‘plots’ folder. The aggregate_table module generates a table that collects the MSE values for each model on different stocks. The analysis module analyzes the aggregate table to determine which model was the most and least accurate and calls the write_agg_csv function to write and aggregate the CSV file with the results.
+
 ## Acknowledgements
 
 - [yfinance](https://pypi.org/project/yfinance/), used to download price data from Yahoo finance
