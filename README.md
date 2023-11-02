@@ -96,12 +96,13 @@ These models are utilized by the `Stock` class and the values that they return a
 The last file that this project utilizes is the analysis file. This file uses the aggregate table that was created earlier and looks at the calcualted mse values to determine which model has the most accurate prediction. 
 
 **To visually understand how these files are connected refer to the UML diagram below:**
-![UML Diagram](images/Checkpoint_2_UML.jpg "")
+![UML Diagram](images/Checkpoint_2_UML%20.jpg "")
 
 ### Information Process Flows
 
 The system starts by initializing a stock object, where current and historical stock data is retrieved, organized, and stored in the Pandas DataFrame. The run_models are called on the object to run two separate machine learning modules, K-Nearest Neighbor (KNN) Regression, and Random Forest (RF) regression. For each model, the Mean Squared Error (MSE) is calculated and the results are stored within the Stock object. The plot_predicted_vs_actual method is called to generate visualizations comparing predicted and actual stock prices using Plotly, these plots are then saved to the ‘plots’ folder. The aggregate_table module generates a table that collects the MSE values for each model on different stocks. The analysis module analyzes the aggregate table to determine which model was the most and least accurate and calls the write_agg_csv function to write and aggregate the CSV file with the results.
 
+**To visually understand how the data flows, refer to the UML diagram below:**
 ![Data Flow Diagram](images/sequence_diagram.png "")
 
 ## Architecure Analysis
